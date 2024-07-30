@@ -33,4 +33,18 @@ defmodule ChatBridge.ChatFixtures do
 
     conversation_member
   end
+
+  @doc """
+  Generate a message.
+  """
+  def message_fixture(attrs \\ %{}) do
+    {:ok, message} =
+      attrs
+      |> Enum.into(%{
+        body: "some body"
+      })
+      |> ChatBridge.Chat.create_message()
+
+    message
+  end
 end

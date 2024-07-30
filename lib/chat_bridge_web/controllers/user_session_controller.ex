@@ -32,7 +32,11 @@ defmodule ChatBridgeWeb.UserSessionController do
     end
   end
 
-  defp create(conn, %{"user" => %{"nickname" => nickname, "password" => password} = user_params}, info) do
+  defp create(
+         conn,
+         %{"user" => %{"nickname" => nickname, "password" => password} = user_params},
+         info
+       ) do
     if user = Accounts.get_user_by_nickname_and_password(nickname, password) do
       conn
       |> put_flash(:info, info)

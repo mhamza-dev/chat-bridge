@@ -17,12 +17,30 @@ defmodule ChatBridgeWeb.UserLoginLive do
 
       <.simple_form for={@form} id="login_form" action={~p"/users/log_in"}>
         <%= case @signin_through do %>
-        <% "nickname" -> %>
-          <.input field={@form[:nickname]} type="text" label="Nick Name" placeholder="i.e: john-doe" required />
-        <% "email" -> %>
-          <.input field={@form[:email]} type="email" label="Email" placeholder="i.e: john.doe@example.com" required />
+          <% "nickname" -> %>
+            <.input
+              field={@form[:nickname]}
+              type="text"
+              label="Nick Name"
+              placeholder="i.e: john-doe"
+              required
+            />
+          <% "email" -> %>
+            <.input
+              field={@form[:email]}
+              type="email"
+              label="Email"
+              placeholder="i.e: john.doe@example.com"
+              required
+            />
         <% end %>
-        <.input field={@form[:password]} type="password" label="Password" placeholder="Enter Password" required />
+        <.input
+          field={@form[:password]}
+          type="password"
+          label="Password"
+          placeholder="Enter Password"
+          required
+        />
 
         <:actions>
           <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" />

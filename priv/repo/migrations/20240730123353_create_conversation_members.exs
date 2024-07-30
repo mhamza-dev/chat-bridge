@@ -4,8 +4,8 @@ defmodule ChatBridge.Repo.Migrations.CreateConversationMembers do
   def change do
     create table(:conversation_members) do
       add :owner, :boolean, default: false, null: false
-      add :conversation_id, references(:conversations, on_delete: :nothing)
-      add :user_id, references(:users, on_delete: :nothing)
+      add :conversation_id, references(:conversations, on_delete: :nothing), null: false
+      add :user_id, references(:users, on_delete: :nothing), null: false
 
       timestamps(type: :utc_datetime)
     end

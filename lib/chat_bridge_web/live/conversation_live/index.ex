@@ -6,7 +6,12 @@ defmodule ChatBridgeWeb.ConversationLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :conversations, Chat.list_conversations())}
+    {:ok,
+     assign(
+       socket,
+       :conversations,
+       Chat.list_conversations() |> preload([:messages, members: [:user]])
+     )}
   end
 
   @impl true
@@ -33,15 +38,23 @@ defmodule ChatBridgeWeb.ConversationLive.Index do
   end
 
   @impl true
-  def handle_info({ChatBridgeWeb.ConversationLive.FormComponent, {:saved, conversation}}, socket) do
-    {:noreply, stream_insert(socket, :conversations, conversation)}
+  def handle_info(
+        {ChatBridgeWeb.ConversationLive.FormComponent, {:saved, conversation}},
+        %{assigns: %{conversations: conversations}} = socket
+      ) do
+    {:noreply, assign(socket, :conversations, conversations ++ [conversation])}
   end
 
   @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
+  def handle_event("delete", %{"id" => id}, %{assigns: %{conversations: conversations}} = socket) do
     conversation = Chat.get_conversation!(id)
     {:ok, _} = Chat.delete_conversation(conversation)
 
-    {:noreply, stream_delete(socket, :conversations, conversation)}
+    {:noreply,
+     assign(socket, :conversations, Enum.filter(conversations, &(&1.id != conversation.id)))}
+  end
+
+  def split_groups(conversations) do
+    Enum.split_with(conversations, fn conversation -> conversation.is_group end)
   end
 end

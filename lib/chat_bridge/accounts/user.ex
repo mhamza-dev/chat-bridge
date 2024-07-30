@@ -47,7 +47,9 @@ defmodule ChatBridge.Accounts.User do
   defp validate_nickname(changeset, opts) do
     changeset
     |> validate_required([:nickname])
-    |> validate_format(:nickname, ~r/^[a-zA-Z][a-zA-Z0-9_-]{2,14}$/, message: "enter valid nickname")
+    |> validate_format(:nickname, ~r/^[a-zA-Z][a-zA-Z0-9_-]{2,14}$/,
+      message: "enter valid nickname"
+    )
     |> validate_length(:nickname, min: 6, max: 160)
     |> maybe_validate_unique_nickname(opts)
   end
@@ -66,7 +68,9 @@ defmodule ChatBridge.Accounts.User do
     |> validate_length(:password, min: 8, max: 72)
     |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
     |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
-    |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
+    |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/,
+      message: "at least one digit or punctuation character"
+    )
     |> maybe_hash_password(opts)
   end
 

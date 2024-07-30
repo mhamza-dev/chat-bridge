@@ -554,11 +554,12 @@ defmodule ChatBridgeWeb.CoreComponents do
       <.back navigate={~p"/posts"}>Back to posts</.back>
   """
   attr :navigate, :any, required: true
+  attr :class, :string, default: ""
   slot :inner_block, required: true
 
   def back(assigns) do
     ~H"""
-    <div class="mt-16">
+    <div class={@class}>
       <.link
         navigate={@navigate}
         class="text-sm font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
@@ -642,6 +643,20 @@ defmodule ChatBridgeWeb.CoreComponents do
     |> JS.hide(to: "##{id}", transition: {"block", "block", "hidden"})
     |> JS.remove_class("overflow-hidden", to: "body")
     |> JS.pop_focus()
+  end
+
+  attr :conversation, :any, required: true
+  attr :user, :any, required: true
+
+  def conversation_title(assigns) do
+    ~H"""
+    <p :if={!@conversation.is_group}>
+      <%= Enum.find(@conversation.members, &(&1.user.id != @user.id)).user.nickname %>
+    </p>
+    <p :if={@conversation.is_group}>
+      <%= @conversation.title %>
+    </p>
+    """
   end
 
   @doc """

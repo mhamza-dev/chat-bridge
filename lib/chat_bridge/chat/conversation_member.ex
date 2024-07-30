@@ -1,11 +1,13 @@
 defmodule ChatBridge.Chat.ConversationMember do
   use Ecto.Schema
   import Ecto.Changeset
+  alias ChatBridge.{Accounts.User, Chat.Conversation}
 
   schema "conversation_members" do
     field :owner, :boolean, default: false
-    field :conversation_id, :id
-    field :user_id, :id
+
+    belongs_to :user, User
+    belongs_to :conversation, Conversation
 
     timestamps(type: :utc_datetime)
   end
@@ -13,7 +15,7 @@ defmodule ChatBridge.Chat.ConversationMember do
   @doc false
   def changeset(conversation_member, attrs) do
     conversation_member
-    |> cast(attrs, [:owner])
-    |> validate_required([:owner])
+    |> cast(attrs, [:owner, :user_id, :conversation_id])
+    |> validate_required([:owner, :user_id, :conversation_id])
   end
 end

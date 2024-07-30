@@ -6,32 +6,64 @@
     </.link>
   </:actions>
 </.header>
+<div>
+  <% {groups, chats} = split_groups(@conversations) %>
+  <p class="font-bold text-[20px]">Chats</p>
+  <ul class="cursor-pointer">
+    <li :if={Enum.empty?(chats)} class="ml-4">
+      No Chat found
+    </li>
+    <li :for={chat <- chats} :if={!Enum.empty?(chats)} class="flex justify-between py-2 ml-4">
+      <div class="flex">
+        <span class="mr-4 font-bold"><%= chat.id %>.</span>
+        <.link navigate={~p"/conversations/#{chat.id}"}>
+          <.conversation_title conversation={chat} user={@current_user} />
+        </.link>
+      </div>
+      <div class="mr-4">
+        <.link patch={~p"/conversations/#{chat.id}/edit"}>Edit</.link>
 
-<.table
-  id="conversations"
-  rows={@streams.conversations}
-  row_click={fn {_id, conversation} -> JS.navigate(~p"/conversations/#{conversation}") end}
+        <.link
+          phx-click={JS.push("delete", value: %{id: chat.id}) |> hide("#conversation-#{chat.id}")}
+          data-confirm="Are you sure?"
+        >
+          Delete
+        </.link>
+      </div>
+    </li>
+  </ul>
+  <p class="font-bold text-[20px]">Groups</p>
+  <ul>
+    <li :if={Enum.empty?(groups)} class="ml-4">
+      No Groups found
+    </li>
+    <li :for={group <- groups} :if={!Enum.empty?(groups)} class="flex justify-between py-2 ml-4">
+      <.conversation_title conversation={group} user={@current_user} />
+      <div class="mr-4">
+        <div class="sr-only">
+          <.link navigate={~p"/conversations/#{group.id}"}>Show</.link>
+        </div>
+        <.link patch={~p"/conversations/#{group.id}/edit"}>Edit</.link>
+
+        <.link
+          phx-click={
+            JS.push("delete", value: %{id: group.id}) |> hide("#conversation-#{group.id}")
+          }
+          data-confirm="Are you sure?"
+        >
+          Delete
+        </.link>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="conversation-modal"
+  show
+  on_cancel={JS.patch(~p"/conversations")}
 >
-  <:col :let={{_id, conversation}} label="Title"><%= conversation.title %></:col>
-  <:col :let={{_id, conversation}} label="Is group"><%= conversation.is_group %></:col>
-  <:col :let={{_id, conversation}} label="Max members"><%= conversation.max_members %></:col>
-  <:action :let={{_id, conversation}}>
-    <div class="sr-only">
-      <.link navigate={~p"/conversations/#{conversation}"}>Show</.link>
-    </div>
-    <.link patch={~p"/conversations/#{conversation}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={{id, conversation}}>
-    <.link
-      phx-click={JS.push("delete", value: %{id: conversation.id}) |> hide("##{id}")}
-      data-confirm="Are you sure?"
-    >
-      Delete
-    </.link>
-  </:action>
-</.table>
-
-<.modal :if={@live_action in [:new, :edit]} id="conversation-modal" show on_cancel={JS.patch(~p"/conversations")}>
   <.live_component
     module={ChatBridgeWeb.ConversationLive.FormComponent}
     id={@conversation.id || :new}

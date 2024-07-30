@@ -42,6 +42,8 @@ defmodule ChatBridgeWeb do
         formats: [:html, :json],
         layouts: [html: ChatBridgeWeb.Layouts]
 
+      import ChatBridge.Repo
+
       import Plug.Conn
       import ChatBridgeWeb.Gettext
 
@@ -53,6 +55,8 @@ defmodule ChatBridgeWeb do
     quote do
       use Phoenix.LiveView,
         layout: {ChatBridgeWeb.Layouts, :app}
+
+      import ChatBridge.Repo
 
       unquote(html_helpers())
     end

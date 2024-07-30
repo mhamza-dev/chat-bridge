@@ -49,7 +49,9 @@ defmodule ChatBridgeWeb.ConversationLiveTest do
     test "updates conversation in listing", %{conn: conn, conversation: conversation} do
       {:ok, index_live, _html} = live(conn, ~p"/conversations")
 
-      assert index_live |> element("#conversations-#{conversation.id} a", "Edit") |> render_click() =~
+      assert index_live
+             |> element("#conversations-#{conversation.id} a", "Edit")
+             |> render_click() =~
                "Edit Conversation"
 
       assert_patch(index_live, ~p"/conversations/#{conversation}/edit")
@@ -72,7 +74,10 @@ defmodule ChatBridgeWeb.ConversationLiveTest do
     test "deletes conversation in listing", %{conn: conn, conversation: conversation} do
       {:ok, index_live, _html} = live(conn, ~p"/conversations")
 
-      assert index_live |> element("#conversations-#{conversation.id} a", "Delete") |> render_click()
+      assert index_live
+             |> element("#conversations-#{conversation.id} a", "Delete")
+             |> render_click()
+
       refute has_element?(index_live, "#conversations-#{conversation.id}")
     end
   end
