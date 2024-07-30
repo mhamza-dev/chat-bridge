@@ -68,6 +68,13 @@ defmodule ChatBridgeWeb.Router do
       on_mount: [{ChatBridgeWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+      scope "/conversations", ConversationLive do
+        live "/", Index, :index
+        live "/new", Index, :new
+        live "/:id/edit", Index, :edit
+        live "/:id", Show, :show
+        live "/:id/show/edit", Show, :edit
+      end
     end
   end
 

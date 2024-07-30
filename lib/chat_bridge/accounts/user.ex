@@ -38,9 +38,18 @@ defmodule ChatBridge.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:nickname, :email, :password])
+    |> validate_nickname(opts)
     |> validate_email(opts)
     |> validate_password(opts)
+  end
+
+  defp validate_nickname(changeset, opts) do
+    changeset
+    |> validate_required([:nickname])
+    |> validate_format(:nickname, ~r/^[a-zA-Z][a-zA-Z0-9_-]{2,14}$/, message: "enter valid nickname")
+    |> validate_length(:nickname, min: 6, max: 160)
+    |> maybe_validate_unique_nickname(opts)
   end
 
   defp validate_email(changeset, opts) do
@@ -54,11 +63,10 @@ defmodule ChatBridge.Accounts.User do
   defp validate_password(changeset, opts) do
     changeset
     |> validate_required([:password])
-    |> validate_length(:password, min: 12, max: 72)
-    # Examples of additional password validation:
-    # |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
-    # |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
-    # |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
+    |> validate_length(:password, min: 8, max: 72)
+    |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
+    |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
+    |> validate_format(:password, ~r/[!?@#$%^&*_0-9]/, message: "at least one digit or punctuation character")
     |> maybe_hash_password(opts)
   end
 
@@ -84,6 +92,16 @@ defmodule ChatBridge.Accounts.User do
       changeset
       |> unsafe_validate_unique(:email, ChatBridge.Repo)
       |> unique_constraint(:email)
+    else
+      changeset
+    end
+  end
+
+  defp maybe_validate_unique_nickname(changeset, opts) do
+    if Keyword.get(opts, :validate_nickname, true) do
+      changeset
+      |> unsafe_validate_unique(:nickname, ChatBridge.Repo)
+      |> unique_constraint(:nickname)
     else
       changeset
     end
