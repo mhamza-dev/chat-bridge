@@ -44,6 +44,12 @@ defmodule ChatBridge.Accounts do
     if User.valid_password?(user, password), do: user
   end
 
+  def get_user_by_nickname_and_password(nickname, password)
+      when is_binary(nickname) and is_binary(password) do
+    user = Repo.get_by(User, nickname: nickname)
+    if User.valid_password?(user, password), do: user
+  end
+
   @doc """
   Gets a single user.
 
