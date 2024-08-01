@@ -19,6 +19,24 @@ defmodule ChatBridgeWeb.CoreComponents do
   alias Phoenix.LiveView.JS
   import ChatBridgeWeb.Gettext
 
+  @colors [
+    "bg-red-400",
+    "bg-orange-400",
+    "bg-yellow-400",
+    "bg-lime-400",
+    "bg-emerald-400",
+    "bg-teal-400",
+    "bg-cyan-400",
+    "bg-sky-400",
+    "bg-blue-400",
+    "bg-indigo-400",
+    "bg-violet-400",
+    "bg-purple-400",
+    "bg-fuchsia-400",
+    "bg-pink-400",
+    "bg-rose-400"
+  ]
+
   @doc """
   Renders a modal.
 
@@ -289,6 +307,8 @@ defmodule ChatBridgeWeb.CoreComponents do
     include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
                 multiple pattern placeholder readonly required rows size step)
 
+  attr :class, :string, default: "w-full"
+
   slot :inner_block
 
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
@@ -333,7 +353,10 @@ defmodule ChatBridgeWeb.CoreComponents do
       <select
         id={@id}
         name={@name}
-        class="mt-2 block w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0 sm:text-sm"
+        class={[
+          "block rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0 sm:text-sm",
+          @class
+        ]}
         multiple={@multiple}
         {@rest}
       >
@@ -353,8 +376,9 @@ defmodule ChatBridgeWeb.CoreComponents do
         id={@id}
         name={@name}
         class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
+          "block rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
           "min-h-[6rem] phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400",
+          @class,
           @errors == [] && "border-zinc-300 focus:border-zinc-400",
           @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
@@ -376,8 +400,9 @@ defmodule ChatBridgeWeb.CoreComponents do
         id={@id}
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
+          "block rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
           "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400",
+          @class,
           @errors == [] && "border-zinc-300 focus:border-zinc-400",
           @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
@@ -647,16 +672,42 @@ defmodule ChatBridgeWeb.CoreComponents do
 
   attr :conversation, :any, required: true
   attr :user, :any, required: true
+  attr :class, :string, default: ""
 
   def conversation_title(assigns) do
     ~H"""
-    <p :if={!@conversation.is_group}>
+    <p :if={!@conversation.is_group} class={@class}>
       <%= Enum.find(@conversation.members, &(&1.user.id != @user.id)).user.nickname %>
     </p>
-    <p :if={@conversation.is_group}>
+    <p :if={@conversation.is_group} class={@class}>
       <%= @conversation.title %>
     </p>
     """
+  end
+
+  attr :user, :any, required: true
+  attr :conversation, :any, default: %{id: 1}
+  attr :class, :string, default: "h-12 w-12"
+
+  def avatar(assigns) do
+    ~H"""
+    <p class={
+      Enum.join(
+        [
+          "flex items-center justify-center rounded-full p-2 text-center text-gray-900 text-[20px] font-bold",
+          @class,
+          bg_color(@user.id, @conversation.id)
+        ],
+        " "
+      )
+    }>
+      <%= String.upcase(String.at(@user.nickname, 0)) %>
+    </p>
+    """
+  end
+
+  def bg_color(uid, cid) do
+    Enum.at(@colors, rem(uid + cid, length(@colors)))
   end
 
   @doc """

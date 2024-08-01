@@ -5,12 +5,12 @@ defmodule ChatBridgeWeb.ConversationLive.Index do
   alias ChatBridge.Chat.Conversation
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(_params, _session, %{assigns: %{current_user: cu}} = socket) do
     {:ok,
      assign(
        socket,
        :conversations,
-       Chat.list_conversations() |> preload([:messages, members: [:user]])
+       Chat.list_conversations(cu.id) |> preload([:messages, members: [:user]])
      )}
   end
 

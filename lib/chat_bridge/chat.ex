@@ -6,7 +6,7 @@ defmodule ChatBridge.Chat do
   import Ecto.Query, warn: false
   alias ChatBridge.Repo
 
-  alias ChatBridge.Chat.Conversation
+  alias ChatBridge.Chat.{Conversation, ConversationMember, Message}
 
   @doc """
   Returns the list of conversations.
@@ -19,6 +19,21 @@ defmodule ChatBridge.Chat do
   """
   def list_conversations do
     Repo.all(Conversation)
+  end
+
+  @doc """
+    list of conversations by user id
+
+    ## Examples
+
+      iex> list_conversations(user_id)
+      [%Conversation{}, ...]
+  """
+  def list_conversations(id) do
+    Conversation
+    |> join(:inner, [c], cm in ConversationMember, on: c.id == cm.conversation_id)
+    |> where([_c, cm], cm.user_id == ^id)
+    |> Repo.all()
   end
 
   @doc """
@@ -101,8 +116,6 @@ defmodule ChatBridge.Chat do
   def change_conversation(%Conversation{} = conversation, attrs \\ %{}) do
     Conversation.changeset(conversation, attrs)
   end
-
-  alias ChatBridge.Chat.ConversationMember
 
   @doc """
   Returns the list of conversation_members.
@@ -197,8 +210,6 @@ defmodule ChatBridge.Chat do
   def change_conversation_member(%ConversationMember{} = conversation_member, attrs \\ %{}) do
     ConversationMember.changeset(conversation_member, attrs)
   end
-
-  alias ChatBridge.Chat.Message
 
   @doc """
   Returns the list of messages.

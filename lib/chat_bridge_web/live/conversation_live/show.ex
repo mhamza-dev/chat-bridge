@@ -7,8 +7,13 @@ defmodule ChatBridgeWeb.ConversationLive.Show do
   alias ChatBridgeWeb.Endpoint
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, socket}
+  def mount(_params, _session, %{assigns: %{current_user: cu}} = socket) do
+    {:ok,
+     assign(
+       socket,
+       :conversations,
+       Chat.list_conversations(cu.id) |> preload([:messages, members: [:user]])
+     )}
   end
 
   @impl true
@@ -50,7 +55,7 @@ defmodule ChatBridgeWeb.ConversationLive.Show do
           new_message
         )
 
-        {:noreply, socket}
+        {:noreply, assign(socket, changeset: Chat.change_message(%Message{}))}
 
       {:error, err} ->
         Logger.error(err)
